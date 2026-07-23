@@ -250,6 +250,15 @@
     <div class="ticket-id" id="ticketId"></div>
   </div>
 
+  <div class="state-card hidden" id="duplicateCard">
+    <div class="icon">📋</div>
+    <h2>Уже записаны</h2>
+    <p>Этот номер уже в списке на самосбор. Если планы изменились — можно отменить запись.</p>
+    <div class="error-msg hidden" id="cancelErrorMsg" style="margin-top:10px;"></div>
+    <button type="button" class="submit-btn" id="cancelRegBtn" style="margin-top:16px;">Отменить запись</button>
+    <div class="hint" id="tryAnotherLink" style="cursor:pointer;text-decoration:underline;margin-top:12px;">Ввести другой номер</div>
+  </div>
+
   <div class="state-card hidden" id="fullCard">
     <div class="icon">🧺</div>
     <h2>Мест больше нет</h2>
@@ -360,6 +369,12 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
     } else if (result.full) {
       document.getElementById('regForm').closest('.card').classList.add('hidden');
       document.getElementById('fullCard').classList.remove('hidden');
+    } else if (result.duplicate) {
+      lastAttemptedPhone = '375 ' + document.getElementById('phone').value.trim();
+      document.getElementById('regForm').closest('.card').classList.add('hidden');
+      document.getElementById('duplicateCard').classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Записаться';
     } else {
       errorEl.textContent = result.message || 'Не получилось записаться, попробуйте ещё раз';
       errorEl.classList.remove('hidden');
@@ -372,6 +387,44 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
     btn.disabled = false;
     btn.textContent = 'Записаться';
   }
+});
+
+let lastAttemptedPhone = '';
+
+document.getElementById('cancelRegBtn').addEventListener('click', async () => {
+  const cbtn = document.getElementById('cancelRegBtn');
+  const cancelErrorEl = document.getElementById('cancelErrorMsg');
+  cancelErrorEl.classList.add('hidden');
+  cbtn.disabled = true;
+  cbtn.textContent = 'Отменяем…';
+
+  try {
+    const result = await apiPost({ action: 'cancel', phone: lastAttemptedPhone });
+    if (result.success) {
+      document.getElementById('duplicateCard').classList.add('hidden');
+      document.getElementById('regForm').closest('.card').classList.remove('hidden');
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      people = 1;
+      peopleVal.textContent = '1';
+      loadStatus();
+    } else {
+      cancelErrorEl.textContent = result.message || 'Не получилось отменить запись';
+      cancelErrorEl.classList.remove('hidden');
+    }
+  } catch (err) {
+    cancelErrorEl.textContent = 'Ошибка соединения — попробуйте ещё раз';
+    cancelErrorEl.classList.remove('hidden');
+  }
+  cbtn.disabled = false;
+  cbtn.textContent = 'Отменить запись';
+});
+
+document.getElementById('tryAnotherLink').addEventListener('click', () => {
+  document.getElementById('duplicateCard').classList.add('hidden');
+  document.getElementById('regForm').closest('.card').classList.remove('hidden');
+  document.getElementById('phone').value = '';
+  document.getElementById('phone').focus();
 });
 </script>
 </body>
