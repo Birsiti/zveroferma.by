@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Самосбор голубики — Ягодное место</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --green-top:#4C6236;
+    --green-bottom:#263420;
+    --cream:#F4EFE1;
+    --sage:#AEC29B;
+    --sage-dim:#93A582;
+    --card-bg:rgba(255,255,255,0.055);
+    --card-border:rgba(255,255,255,0.14);
+    --input-bg:rgba(255,255,255,0.08);
+    --input-border:rgba(255,255,255,0.20);
+    --cta-bg:#F4EFE1;
+    --cta-text:#263420;
+    --error:#E8A36B;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse 700px 500px at 75% 8%, rgba(255,255,255,0.07), transparent 60%),
+      linear-gradient(180deg, var(--green-top) 0%, var(--green-bottom) 100%);
+    background-attachment:fixed;
+    color:var(--cream);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:36px 20px 44px;}
+
+  .eyebrow{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--sage);
+    text-align:center;
+    margin-bottom:10px;
+  }
+  .hero{text-align:center;padding-bottom:22px;}
+  .basket{font-size:64px;line-height:1;margin:0 auto 10px;text-align:center;}
+  h1{
+    font-family:'Playfair Display',Georgia,serif;
+    font-weight:800;
+    font-size:32px;
+    line-height:1.15;
+    margin:0 0 12px;
+    color:var(--cream);
+  }
+  .sub{font-size:15px;line-height:1.55;color:var(--sage);margin:0 auto;max-width:340px;}
+
+  .info-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+  }
+  .info-pill{
+    background:rgba(255,255,255,0.09);
+    border:1px solid var(--card-border);
+    border-radius:999px;
+    padding:8px 16px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--cream);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .counter-card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:22px;
+    padding:18px 20px;
+    margin:20px 0;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    backdrop-filter:blur(6px);
+  }
+  .counter-jar{width:42px;height:42px;flex:none;}
+  .counter-text{flex:1;}
+  .counter-title{font-size:12px;color:var(--sage-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+  .counter-value{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:700;color:var(--cream);}
+  .counter-bar{
+    height:6px;background:rgba(255,255,255,0.12);border-radius:4px;overflow:hidden;margin-top:9px;
+  }
+  .counter-bar-fill{
+    height:100%;background:linear-gradient(90deg,var(--sage),var(--cream));
+    border-radius:4px;transition:width .5s ease;
+  }
+
+  .card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:24px;
+    padding:24px 22px;
+    backdrop-filter:blur(6px);
+  }
+
+  form{display:flex;flex-direction:column;gap:15px;}
+  label{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sage-dim);margin-bottom:7px;display:block;}
+  input, select{
+    width:100%;
+    padding:13px 14px;
+    border:1.5px solid var(--input-border);
+    border-radius:12px;
+    font-size:16px;
+    font-family:inherit;
+    background:var(--input-bg);
+    color:var(--cream);
+    outline:none;
+    transition:border-color .15s;
+    color-scheme:dark;
+  }
+  input::placeholder{color:rgba(244,239,225,0.42);}
+  input:focus, select:focus{border-color:var(--cream);}
+  .field{display:flex;flex-direction:column;}
+
+  .phone-row{display:flex;gap:0;}
+  .phone-prefix{
+    display:flex;align-items:center;justify-content:center;
+    padding:0 10px;
+    border:1.5px solid var(--input-border);
+    border-right:none;
+    border-radius:12px 0 0 12px;
+    background:rgba(255,255,255,0.12);
+    color:var(--cream);
+    font-size:16px;
+    font-weight:600;
+    flex:none;
+  }
+  .phone-row input{
+    border-radius:0 12px 12px 0;
+  }
+
+  .stepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--input-border);border-radius:12px;overflow:hidden;background:var(--input-bg);width:fit-content;}
+  .stepper button{
+    width:44px;height:44px;border:none;background:transparent;font-size:20px;color:var(--cream);cursor:pointer;
+  }
+  .stepper button:active{background:rgba(255,255,255,0.08);}
+  .stepper .val{width:44px;text-align:center;font-size:16px;font-weight:600;color:var(--cream);}
+
+  .submit-btn{
+    margin-top:6px;
+    background:var(--cta-bg);
+    color:var(--cta-text);
+    border:none;
+    border-radius:14px;
+    padding:16px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform .1s, opacity .15s;
+  }
+  .submit-btn:active{transform:scale(0.98);}
+  .submit-btn:hover{opacity:0.92;}
+  .submit-btn:disabled{background:rgba(244,239,225,0.35);cursor:not-allowed;}
+
+  .hint{font-size:12px;color:var(--sage-dim);text-align:center;margin-top:2px;}
+
+  .state-card{
+    background:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:24px;
+    padding:32px 22px;
+    text-align:center;
+    backdrop-filter:blur(6px);
+  }
+  .state-card .icon{font-size:40px;margin-bottom:12px;}
+  .state-card h2{font-family:'Playfair Display',Georgia,serif;font-size:22px;font-weight:800;margin:0 0 8px;color:var(--cream);}
+  .state-card p{font-size:14px;line-height:1.55;color:var(--sage);margin:0;}
+  .ticket-id{
+    display:inline-block;margin-top:16px;padding:7px 14px;background:rgba(255,255,255,0.1);
+    border-radius:8px;font-family:'Courier New',monospace;font-size:13px;color:var(--cream);
+  }
+
+  .hidden{display:none !important;}
+  .error-msg{color:var(--error);font-size:13px;margin-top:-4px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="basket">🫐</div>
+    <div class="eyebrow">Запись ограничена</div>
+    <h1>Самосбор<br>голубики</h1>
+    <p class="sub">В этом году ягоды меньше обычного — открываем запись на ограниченное число сборщиков.</p>
+    <div class="info-row">
+      <div class="info-pill">📅 25 июля, сб · с 10:00</div>
+      <div class="info-pill">💰 15 руб/кг</div>
+    </div>
+  </div>
+
+  <div class="counter-card">
+    <svg class="counter-jar" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="8" width="24" height="30" rx="4" stroke="#F4EFE1" stroke-width="2" fill="rgba(255,255,255,0.05)"/>
+      <rect x="14" y="4" width="16" height="6" rx="2" fill="#F4EFE1"/>
+      <rect id="jarFill" x="12" y="26" width="20" height="10" rx="2" fill="#AEC29B" opacity="0.9"/>
+    </svg>
+    <div class="counter-text">
+      <div class="counter-title">Свободные места</div>
+      <div class="counter-value" id="counterValue">загрузка…</div>
+      <div class="counter-bar"><div class="counter-bar-fill" id="counterBar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <form id="regForm">
+      <div class="field">
+        <label for="name">Имя</label>
+        <input type="text" id="name" required placeholder="Как к Вам обращаться">
+      </div>
+      <div class="field">
+        <label for="phone">Телефон</label>
+        <div class="phone-row">
+          <span class="phone-prefix">+375</span>
+          <input type="tel" id="phone" required placeholder="29 777 72 22" inputmode="numeric">
+        </div>
+      </div>
+      <div class="field">
+        <label>Количество человек</label>
+        <div class="stepper">
+          <button type="button" id="minus">−</button>
+          <div class="val" id="peopleVal">1</div>
+          <button type="button" id="plus">+</button>
+        </div>
+      </div>
+      <div class="error-msg hidden" id="errorMsg"></div>
+      <button type="submit" class="submit-btn" id="submitBtn">Записаться</button>
+      <div class="hint">🔒 Вход на поле — только по регистрации</div>
+    </form>
+  </div>
+
+  <div class="state-card hidden" id="successCard">
+    <div class="icon">🫐</div>
+    <h2>Записали!</h2>
+    <p>Ждём Вас 25 июля (суббота) в 10:00. Если что-то изменится — позвоним.</p>
+    <div class="ticket-id" id="ticketId"></div>
+  </div>
+
+  <div class="state-card hidden" id="fullCard">
+    <div class="icon">🧺</div>
+    <h2>Мест больше нет</h2>
+    <p>Все места на этот сезон заняты. Следи за новостями в Viber-группе — если освободится место, сообщим там.</p>
+  </div>
+
+</div>
+
+<script>
+const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();}
+
+const CONFIG = {
+  apiUrl: 'ВСТАВЬ_URL_APPS_SCRIPT_СЮДА', // URL из деплоя Apps Script, заканчивается на /exec
+  limit: 15
+};
+
+let people = 1;
+const peopleVal = document.getElementById('peopleVal');
+document.getElementById('minus').onclick = () => { if(people>1){people--; peopleVal.textContent=people;} };
+document.getElementById('plus').onclick = () => { if(people<5){people++; peopleVal.textContent=people;} };
+
+const phoneInput = document.getElementById('phone');
+function formatPhone(raw) {
+  const digits = raw.replace(/\D/g, '').slice(0, 9);
+  const parts = [];
+  if (digits.length > 0) parts.push(digits.slice(0, 2));
+  if (digits.length > 2) parts.push(digits.slice(2, 5));
+  if (digits.length > 5) parts.push(digits.slice(5, 7));
+  if (digits.length > 7) parts.push(digits.slice(7, 9));
+  return parts.join(' ');
+}
+phoneInput.addEventListener('input', (e) => {
+  e.target.value = formatPhone(e.target.value);
+});
+
+async function apiGet() {
+  const res = await fetch(CONFIG.apiUrl);
+  return res.json();
+}
+async function apiPost(payload) {
+  const res = await fetch(CONFIG.apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+function renderCounter(status) {
+  const remaining = Math.max(status.remaining, 0);
+  const limit = status.limit || CONFIG.limit;
+  document.getElementById('counterValue').textContent = remaining + ' из ' + limit;
+  const filledPct = Math.min(100, Math.round((limit - remaining) / limit * 100));
+  document.getElementById('counterBar').style.width = filledPct + '%';
+  if (status.full) {
+    document.getElementById('regForm').closest('.card').classList.add('hidden');
+    document.getElementById('fullCard').classList.remove('hidden');
+  }
+}
+
+async function loadStatus() {
+  try {
+    const status = await apiGet();
+    renderCounter(status);
+  } catch (e) {
+    document.getElementById('counterValue').textContent = '15 из 15';
+  }
+}
+loadStatus();
+
+document.getElementById('regForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('errorMsg');
+  errorEl.classList.add('hidden');
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Записываем…';
+
+  const payload = {
+    action: 'register',
+    name: document.getElementById('name').value.trim(),
+    phone: '+375 ' + document.getElementById('phone').value.trim(),
+    people: people
+  };
+
+  try {
+    const result = await apiPost(payload);
+    if (result.success) {
+      document.getElementById('regForm').closest('.card').classList.add('hidden');
+      document.getElementById('successCard').classList.remove('hidden');
+      document.getElementById('ticketId').textContent = '№ ' + (result.id || '—');
+    } else if (result.full) {
+      document.getElementById('regForm').closest('.card').classList.add('hidden');
+      document.getElementById('fullCard').classList.remove('hidden');
+    } else {
+      errorEl.textContent = result.message || 'Не получилось записаться, попробуйте ещё раз';
+      errorEl.classList.remove('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Записаться';
+    }
+  } catch (err) {
+    errorEl.textContent = 'Ошибка соединения — попробуйте ещё раз';
+    errorEl.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = 'Записаться';
+  }
+});
+</script>
+</body>
+</html>
