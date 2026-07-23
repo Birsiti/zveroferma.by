@@ -220,13 +220,13 @@
     <form id="regForm">
       <div class="field">
         <label for="name">Имя</label>
-        <input type="text" id="name" required placeholder="Как к Вам обращаться">
+        <input type="text" id="name" required autocomplete="name" placeholder="Как к Вам обращаться">
       </div>
       <div class="field">
         <label for="phone">Телефон</label>
         <div class="phone-row">
           <span class="phone-prefix">+375</span>
-          <input type="tel" id="phone" required placeholder="29 777 72 22" inputmode="numeric">
+          <input type="tel" id="phone" required autocomplete="tel-national" placeholder="29 777 72 22" inputmode="numeric">
         </div>
       </div>
       <div class="field">
@@ -260,9 +260,10 @@
 
 <script>
 const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();}
+const telegramUser = tg?.initDataUnsafe?.user || null;
 
 const CONFIG = {
-  apiUrl: 'ВСТАВЬ_URL_APPS_SCRIPT_СЮДА', // URL из деплоя Apps Script, заканчивается на /exec
+  apiUrl: 'https://script.google.com/macros/s/AKfycbwX1NMQRLnIZwut5M3XBH7h9W-59OiyDzbgT3G9ma_uHug7yZa1IkTVajcaPLTRjUYj/exec',
   limit: 15
 };
 
@@ -332,6 +333,7 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
     action: 'register',
     name: document.getElementById('name').value.trim(),
     phone: '+375 ' + document.getElementById('phone').value.trim(),
+    telegramId: telegramUser?.id || '',
     people: people
   };
 
