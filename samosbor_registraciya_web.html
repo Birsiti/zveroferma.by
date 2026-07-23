@@ -264,7 +264,7 @@ const telegramUser = tg?.initDataUnsafe?.user || null;
 
 const CONFIG = {
   apiUrl: 'https://script.google.com/macros/s/AKfycbwX1NMQRLnIZwut5M3XBH7h9W-59OiyDzbgT3G9ma_uHug7yZa1IkTVajcaPLTRjUYj/exec',
-  limit: 15
+  limit: 10
 };
 
 let people = 1;
@@ -316,7 +316,7 @@ async function loadStatus() {
     const status = await apiGet();
     renderCounter(status);
   } catch (e) {
-    document.getElementById('counterValue').textContent = '15 из 15';
+    document.getElementById('counterValue').textContent = '10 из 10';
   }
 }
 loadStatus();
