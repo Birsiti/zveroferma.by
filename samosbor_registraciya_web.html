@@ -220,13 +220,13 @@
     <form id="regForm">
       <div class="field">
         <label for="name">Имя</label>
-        <input type="text" id="name" required autocomplete="name" placeholder="Как к Вам обращаться">
+        <input type="text" id="name" name="reg_name_field" required autocomplete="off" placeholder="Как к Вам обращаться">
       </div>
       <div class="field">
         <label for="phone">Телефон</label>
         <div class="phone-row">
           <span class="phone-prefix">+375</span>
-          <input type="tel" id="phone" required autocomplete="tel-national" placeholder="29 777 72 22" inputmode="numeric">
+          <input type="tel" id="phone" name="reg_phone_field" required autocomplete="off" placeholder="29 777 72 22" inputmode="numeric">
         </div>
       </div>
       <div class="field">
@@ -325,13 +325,27 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errorEl = document.getElementById('errorMsg');
   errorEl.classList.add('hidden');
+  const nameValue = document.getElementById('name').value.trim();
+  const phoneDigits = document.getElementById('phone').value.replace(/\D/g, '');
+
+  if (!nameValue) {
+    errorEl.textContent = 'Введите имя';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+  if (phoneDigits.length !== 9) {
+    errorEl.textContent = 'Введите номер телефона полностью';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = 'Записываем…';
 
   const payload = {
     action: 'register',
-    name: document.getElementById('name').value.trim(),
+    name: nameValue,
     phone: '375 ' + document.getElementById('phone').value.trim(),
     telegramId: telegramUser?.id || '',
     people: people
