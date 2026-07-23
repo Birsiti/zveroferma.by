@@ -332,7 +332,7 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
   const payload = {
     action: 'register',
     name: document.getElementById('name').value.trim(),
-    phone: '+375 ' + document.getElementById('phone').value.trim(),
+    phone: '375 ' + document.getElementById('phone').value.trim(),
     telegramId: telegramUser?.id || '',
     people: people
   };
