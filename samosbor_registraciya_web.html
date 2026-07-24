@@ -217,6 +217,7 @@
   </div>
 
   <div class="card">
+    <div class="error-msg hidden" id="waitlistNotice" style="color:var(--sage);margin-bottom:14px;">📋 Мест нет — заполните форму, чтобы встать в лист ожидания. Сообщим первым, если кто-то отменит запись.</div>
     <form id="regForm">
       <div class="field">
         <label for="name">Имя</label>
@@ -259,10 +260,10 @@
     <div class="hint" id="tryAnotherLink" style="cursor:pointer;text-decoration:underline;margin-top:12px;">Ввести другой номер</div>
   </div>
 
-  <div class="state-card hidden" id="fullCard">
-    <div class="icon">🧺</div>
-    <h2>Мест больше нет</h2>
-    <p>Все места на этот сезон заняты. Следи за новостями в Viber-группе — если освободится место, сообщим там.</p>
+  <div class="state-card hidden" id="waitlistCard">
+    <div class="icon">📋</div>
+    <h2>Записали в лист ожидания!</h2>
+    <p>Если кто-то отменит запись — сообщим Вам первым в Telegram.</p>
   </div>
 
 </div>
@@ -308,24 +309,40 @@ async function apiPost(payload) {
   return res.json();
 }
 
+let formMode = 'register';
+
 function renderCounter(status) {
   const remaining = Math.max(status.remaining, 0);
   const limit = status.limit || CONFIG.limit;
   document.getElementById('counterValue').textContent = remaining + ' из ' + limit;
   const filledPct = Math.min(100, Math.round((limit - remaining) / limit * 100));
   document.getElementById('counterBar').style.width = filledPct + '%';
-  if (status.full) {
-    document.getElementById('regForm').closest('.card').classList.add('hidden');
-    document.getElementById('fullCard').classList.remove('hidden');
+  setFormMode(status.full ? 'waitlist' : 'register');
+}
+
+function setFormMode(mode) {
+  formMode = mode;
+  const btn = document.getElementById('submitBtn');
+  const notice = document.getElementById('waitlistNotice');
+  if (mode === 'waitlist') {
+    btn.textContent = 'Встать в лист ожидания';
+    notice.classList.remove('hidden');
+  } else {
+    btn.textContent = 'Записаться';
+    notice.classList.add('hidden');
   }
 }
 
 async function loadStatus() {
   try {
     const status = await apiGet();
+    if (status.error) {
+      throw new Error(status.message || 'backend error');
+    }
     renderCounter(status);
   } catch (e) {
-    document.getElementById('counterValue').textContent = '10 из 10';
+    document.getElementById('counterValue').textContent = 'ошибка загрузки';
+    document.getElementById('counterBar').style.width = '0%';
   }
 }
 loadStatus();
@@ -349,11 +366,12 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
   }
 
   const btn = document.getElementById('submitBtn');
+  const isWaitlist = formMode === 'waitlist';
   btn.disabled = true;
-  btn.textContent = 'Записываем…';
+  btn.textContent = isWaitlist ? 'Записываем в очередь…' : 'Записываем…';
 
   const payload = {
-    action: 'register',
+    action: isWaitlist ? 'waitlist' : 'register',
     name: nameValue,
     phone: '375 ' + document.getElementById('phone').value.trim(),
     telegramId: telegramUser?.id || '',
@@ -364,28 +382,35 @@ document.getElementById('regForm').addEventListener('submit', async (e) => {
     const result = await apiPost(payload);
     if (result.success) {
       document.getElementById('regForm').closest('.card').classList.add('hidden');
-      document.getElementById('successCard').classList.remove('hidden');
-      document.getElementById('ticketId').textContent = '№ ' + (result.id || '—');
+      if (isWaitlist) {
+        document.getElementById('waitlistCard').classList.remove('hidden');
+      } else {
+        document.getElementById('successCard').classList.remove('hidden');
+        document.getElementById('ticketId').textContent = '№ ' + (result.id || '—');
+      }
     } else if (result.full) {
-      document.getElementById('regForm').closest('.card').classList.add('hidden');
-      document.getElementById('fullCard').classList.remove('hidden');
+      // места закончились прямо во время заполнения формы — переключаемся в режим ожидания
+      errorEl.textContent = 'Места как раз закончились — нажмите кнопку ещё раз, чтобы встать в лист ожидания';
+      errorEl.classList.remove('hidden');
+      setFormMode('waitlist');
+      btn.disabled = false;
     } else if (result.duplicate) {
       lastAttemptedPhone = '375 ' + document.getElementById('phone').value.trim();
       document.getElementById('regForm').closest('.card').classList.add('hidden');
       document.getElementById('duplicateCard').classList.remove('hidden');
       btn.disabled = false;
-      btn.textContent = 'Записаться';
+      setFormMode(formMode);
     } else {
       errorEl.textContent = result.message || 'Не получилось записаться, попробуйте ещё раз';
       errorEl.classList.remove('hidden');
       btn.disabled = false;
-      btn.textContent = 'Записаться';
+      setFormMode(formMode);
     }
   } catch (err) {
     errorEl.textContent = 'Ошибка соединения — попробуйте ещё раз';
     errorEl.classList.remove('hidden');
     btn.disabled = false;
-    btn.textContent = 'Записаться';
+    setFormMode(formMode);
   }
 });
 
